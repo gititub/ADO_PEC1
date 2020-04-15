@@ -1,0 +1,22 @@
+---
+title: "PEC1_ADO"
+author: "Amelia Martínez Sequera"
+date: "Abril/2020"
+---
+
+
+```{r , include= T}
+library(Biobase)
+library(GEOquery)
+gset <- getGEO("GSE138376", GSEMatrix =TRUE, getGPL=FALSE)
+if (length(gset) > 1) idx <- grep("GPL23159", attr(gset, "names")) else idx <- 1
+gset <- gset[[idx]]  
+```
+
+```{r}
+dev.new(width=4+dim(gset)[[2]]/5, height=6)
+par(mar=c(2+round(max(nchar(sampleNames(gset)))/2),4,2,1))
+title <- paste ("GSE138376", '/', annotation(gset), " selected samples", sep ='')
+boxplot(exprs(gset), boxwex=0.7, notch=T, main=title, outline=FALSE, las=2)
+```
+

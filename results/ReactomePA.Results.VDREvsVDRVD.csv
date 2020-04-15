@@ -1,0 +1,7 @@
+"ID","Description","GeneRatio","BgRatio","pvalue","p.adjust","qvalue","geneID","Count"
+"R-MMU-380108","Chemokine receptors bind chemokines","8/200","56/8772",3.52619614179668e-05,0.0145851130768714,0.0139142475690766,"Ccr9/Xcl1/Cxcr3/Ccr6/Ccr8/Cxcr6/Ccr5/Ccl5",8
+"R-MMU-416476","G alpha (q) signalling events","15/200","200/8772",4.96937413181308e-05,0.0145851130768714,0.0139142475690766,"Xcl1/F2r/Rgs1/F2rl1/F2rl2/Ltb4r1/Rps6ka2/Lpar6/Gpr132/Gnaq/Gnb5/Cysltr1/Cysltr2/Anxa1/Hbegf",15
+"R-MMU-373076","Class A/1 (Rhodopsin-like receptors)","18/200","298/8772",0.000150542545196158,0.0234131962299365,0.0223362689757486,"Ccr9/Xcl1/F2r/F2rl1/Cxcr3/Ccr6/F2rl2/Ltb4r1/Ccr8/Lpar6/Cxcr6/Ccr5/Gpr132/Ccl5/Ptgdr2/Cysltr1/Cysltr2/Anxa1",18
+"R-MMU-391903","Eicosanoid ligand-binding receptors","4/200","13/8772",0.000159544778398204,0.0234131962299365,0.0223362689757486,"Ltb4r1/Ptgdr2/Cysltr1/Cysltr2",4
+"R-MMU-500792","GPCR ligand binding","20/200","385/8772",0.000480587275570497,0.049485075815804,0.0472089309316018,"Ccr9/Xcl1/F2r/F2rl1/Cxcr3/Ccr6/F2rl2/Ramp3/Ltb4r1/Ccr8/Lpar6/Cxcr6/Ccr5/Gpr132/Ccl5/Gnb5/Ptgdr2/Cysltr1/Cysltr2/Anxa1",20
+"R-MMU-168643","Nucleotide-binding domain, leucine rich repeat containing receptor (NLR) signaling pathways","6/200","45/8772",0.000505809974267162,0.049485075815804,0.0472089309316018,"Mapk12/Bcl2/P2rx7/Irak2/Tnfaip3/Birc2",6

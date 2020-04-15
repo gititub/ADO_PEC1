@@ -1,0 +1,414 @@
+---
+title: "MartínezAmelia_ADO_PEC1"
+author: "Amelia Martínez Sequera"
+date: "Abril 2020"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+Datos de expresión de células HepG2 transfectadas con el receptor de vitamina D (VDR) y activadas por vitamina D (calcitriol)(humano). Ramiro Jover, IIS Hospital La Fe (Valencia).
+El conjunto de datos se identifica con el número de acceso GSE138376
+
+Resumen:
+En el presente estudio, el objetivo es definir el papel del VDR en el metabolismo lipídico general mediante análisis transcriptómicos y metabólicos de hepatocitos humanos tras la activación del VDR por vitamina D (VitD).
+En este conjunto de datos se incluyen los datos de expresión obtenidos de células HepG2 transfectadas con un vector adenoviral sin inserción o con un adenovirus que codifica VDR humano. Las células que expresan VDR fueron tratadas con VitD o vehículo.
+Diseño experimental:
+Se analizaron 9 muestras en total: 3 células de control con adenovirus sin inserto Ad-C durante 48 h + 4 h de vehículo; 3 células Ad-VDR 48 h + 4 h vehículo; y 3 células Ad-VDR 48 h + 4 h 10 nM VitD (calcitriol). 3 experimentos independientes.
+GSM4106225	Hep-C-E1
+GSM4106226	Hep-VDR-E1
+GSM4106227	Hep-VDR / VitD-E1
+GSM4106228	Hep-C-E2
+GSM4106229	Hep-VDR-E2
+GSM4106230	Hep-VDR / VitD-E2
+GSM4106231	Hep-C-E3
+GSM4106232	Hep-VDR-E3
+GSM4106233	Hep-VDR / VitD-E3
+
+
+Protocolo de tratamiento:	Las células HepG2 se infectaron con vectores adenovirales (Ad-VDR, que codifica VDR humano, o Ad-C, un adenovirus sin inserto) y 48 h últimas células se trasladaron a medio libre de adenovirus y se cultivaron durante 4 h en presencia de VitD 10 nM ( 1a, 25-dihidroxivitamina D3 / calcitriol).
+
+Protocolo de crecimiento:	Las células HepG2 se cultivaron en medio Ham's F-12 / Leibovitz L-15 (1: 1, v / v) suplementado con 7% de suero de ternera recién nacido, 2 mmol / L de L-glutamina, 50 U / ml de penicilina y 50 mg / ml de estreptomicina.
+Molécula extraída: ARN total.
+
+Protocolo de extracción:	El ARN celular total se extrajo con el minikit RNeasy Plus (Qiagen), que elimina el ADN genómico contaminante. La concentración de ARN se midió por absorbancia a 260 nm con un espectrofotómetro capilar (GeneQuant Pro, GE Healthcare Biosciences). La pureza se examinó mediante relaciones OD260 / 230 y OD260 / 280. La integridad del ARN se evaluó con un bioanalizador 2100 con nanoanálisis de ARN total eucariota (Agilent Technologies). Los números de integridad de ARN fueron todos superiores a 9.3.
+El cRNA fue biotinilado y fragmentado, usando el Kit de etiquetado de terminal WT (Affymetrix), derivado de 300 ng de ARN total
+ 	
+Protocolo de hibridación:	El cóctel de hibridación se calentó a 99 ° durante 5 minutos seguido de 45 ° durante 5 minutos y luego se centrifugó a velocidad máxima durante 1 minuto. Se transfirieron 80 µl a cada matriz. La matriz Genechip se incubó durante la noche a 45 ° C mientras giraba en un horno de hibridación 645 (Affymetrix). Después de 16 h de hibridación, se retiró el cóctel y las matrices se lavaron y se tiñeron en una estación de fluidos Affymetrix GeneChip Fluidics 450, de acuerdo con el protocolo FS450_0007.
+
+Protocolo de escaneo:	La distribución de señales fluorescentes en la matriz se obtuvo utilizando GeneChip Scanner 3000 7G (Affymetrix). El software operativo GeneChip (Affymetrix) se utilizó para generar los archivos CEL.
+Descripción	Transfección de 48 h + tratamiento de 4 h (Veh = DMSO)
+
+Procesamiento de los datos:
+Los datos se normalizaron usando el método RMA, y las sondas se resumieron usando la anotación de sonda basada en entrez revisada. Se empleó un paso de filtrado de la sonda que excluye aquellas sondas que muestran un coeficiente de variación más bajo, niveles de baja intensidad en todas las observaciones o que no son informativos (no anotados). El análisis de expresión diferencial se evaluó utilizando modelos lineales para datos de microarrays basados en estadísticas t moderadas empíricas de Bayes para todos los conjuntos de sondas filtradas. Para corregir las pruebas múltiples, se estimó la tasa de descubrimiento falso a partir de los valores p derivados de las estadísticas t moderadas utilizando el método de Benjamini y Hochberg. Los datos también se analizaron con Transcriptome Analysis Console versión 4.0.2 (TAC 4.0.2) utilizando la configuración de análisis predeterminada de Affymetrix.
+
+
+```{r, include=T, echo=T}
+require(Biobase)
+library(Biobase)
+if(!requireNamespace("BiocManager", quietly = T))
+install.packages("BiocManager")
+BiocManager::install()
+BiocManager::install("affyPLM")
+BiocManager::install("oligo")
+BiocManager::install("simpleaffy")
+BiocManager::install("affydata")
+install.packages("knitr")
+install.packages("colorspace")
+install.packages("gplots")
+install.packages("ggplot2")
+install.packages("ggrepel")
+install.packages("htmlTable")
+install.packages("prettydoc")
+install.packages("devtools")
+install.packages("BiocManager")
+BiocManager::install("oligo")
+BiocManager::install("pd.mogene.2.1.st")
+BiocManager::install("arrayQualityMetrics")
+BiocManager::install("pvca")
+BiocManager::install("limma")
+BiocManager::install("genefilter")
+BiocManager::install("mogene21sttranscriptcluster.db")
+BiocManager::install("annotate")
+BiocManager::install("org.Mm.eg.db")
+BiocManager::install("ReactomePA")
+BiocManager::install("reactome.db")
+BiocManager::install("GEOquery")
+library(affy)
+library(affydata)
+library(oligo)
+library(oligoClasses)
+library(Biobase)
+library(pd.mogene.2.1.st)
+library(arrayQualityMetrics)
+library(ggplot2)
+library(ggrepel)
+celfiles<- list.celfiles("C:\\Users\\Meli\\Documents\\R\\PEC1_AO\\data", full.names=T)
+knitr::kable(mytargets, booktabs=T)
+exprsFile<- file.path("C:\\Users\\Meli\\Documents\\R\\PEC1_AO\\data", "mytargets.txt")
+exprs <- as.matrix(read.table(exprsFile,header=T, sep=";", row.names = 1, as.is=T))
+class(exprs)
+dim(exprs)
+colnames(exprs)
+head(exprs)
+my.target<- read.AnnotatedDataFrame(exprsFile, sep=";",header=T,row.names=1, as.is=T)
+rawdata<- read.celfiles(celfiles, phenoData =my.target)
+colnames(rawdata)<- rownames(pData(rawdata))
+
+```
+```{r, include=T}
+head(rawdata)
+```
+Se han almacenado los datos brutos (.CEL files) en una variable que hemos llamado rawdata. Mediante un ExpressionSet se asocian estos datos con el archivo mytargets.txt, creando una matriz de datos
+
+## Control de calidad de los datos sin procesar.
+
+```{r}
+arrayQualityMetrics(rawdata)
+```
+Según este análisis, únicamente la muestra 2 muestra outliers detectados por MAplots.
+
+```{r, echo=T, include=T}
+library(ggplot2)
+boxplot(rawdata, which= "all",cex.axis=0.5, las=2 ,col = c(rep("red", 3), rep("blue", 3), rep("green", 3)))
+              
+```
+
+## Normalización de datos.
+
+En este paso del procesado de datos se intenta eliminar toda la variabilidad que no sea debida a la expresión diferencial de genes. Incluye 3 procesos dentro de la función rma: corrección de fondo, normalización y resumen.
+```{r, echo=T, include=T}
+eset_rma <- rma(rawdata)
+```
+
+## Control de calidad de los datos normalizados.
+```{r, echo=T, include=T}
+arrayQualityMetrics(eset_rma)
+boxplot (eset_rma, which= "all",cex.axis=0.5, las=2 ,col = c(rep("red", 3), rep("blue", 3), rep("green", 3)))
+
+```
+en este gráfico de cajas se observa que es el array número 7 el que difiere levemente en la posición (centrado).
+
+## Detección de lotes.
+
+```{r, echo=T, include=T}
+library(pvca)
+pData(eset_rma)<- mytargets
+pct_threshold<- 0.6
+batch.factors <- c("Group","Treatment")
+pvcaObj <- pvcaBatchAssess(eset_rma, batch.factors, pct_threshold)
+pvcaObj
+```
+Se observa que la mayor fuente de variabilidad
+
+```{r, echo=T, include=T}
+bar<- barplot(pvcaObj$dat, xlab="fuente", ylab="variabilidad", col="green", main="PVCA")
+```
+
+## Detección de genes más variables.
+
+Trazar la variabilidad general de todos los genes es útil para decidir qué porcentaje de genes muestra una variabilidad que puede atribuirse a otras causas que no sean la variación aleatoria.
+
+```{r,echo=T, include=T}
+sds <- apply(exprs(eset_rma),1, sd)
+sds0<- sort(sds)
+plot(1:length(sds0), sds0, main="Distribución de variabilidad para todos los genes", xlab="gene index", ylab="desviación standard")
+```
+## Filtrar genes con menos variabilidad.
+
+Consiste en filtrar genes cuya variabilidad se puede atribuir a la variación aleatoria, es decir, los genes que, razonablemente, no se espera que se expresen diferencialmente.
+
+```{r, include=T}
+library(genefilter)
+library(mogene21sttranscriptcluster.db)
+library(AnnotationDbi)
+library(org.Mm.eg.db)
+annotation(eset_rma)<-"mogene21sttranscriptcluster.db"
+filtered <- nsFilter(eset_rma, require.entrez = T, remove.dupEntrez = T, var.filter = T, var.func = IQR, var.cutoff = 0.75, filterByQuantile = T, feature.exclude = "^AFFX")
+print(filtered$filter.log)
+
+```
+```{r, echo=T, include=T}
+eset_filtered <- filtered$eset
+eset_filtered
+```
+Por lo tanto, quedan 5991 genes después de filtrar, que quedan almacenados en la variable eset_filtered.
+```{r, include=T}
+write.csv(exprs(eset_rma), file="./results/normalized.Data.csv")
+write.csv(exprs(eset_filtered), file="./results/normalized.Filtered.Data.csv")
+save(eset_rma, eset_filtered, file="./results/normalized.Data.Rda")
+```
+## Matriz de diseño.
+
+```{r, echo=T, include=T}
+library(limma)
+designMat <- model.matrix(~0+Group, pData(eset_filtered))
+colnames(designMat) <- c("control", "VDRE", "VDRVD")
+print(designMat)
+```
+
+## Matriz de contrastes.
+
+```{r, echo=T, include=T}
+cont.matrix<- makeContrasts(VDREvsVDRVD=VDRE-VDRVD, controlvsVDRVD=control-VDRVD, controlvsVDRE=control-VDRE, levels = designMat)
+print(cont.matrix)
+```
+
+## Estimación del modelo y selección de genes.
+
+```{r, echo=T,include=T}
+fit<-lmFit(eset_filtered, designMat)
+fit.main<-contrasts.fit(fit, cont.matrix)
+fit.main<-eBayes(fit.main)
+class(fit.main)
+```
+
+## Obtención de genes expresados diferencialmente.
+
+La función topTable contiene, para un contraste dado, una lista de genes ordenados desde el valor de p más pequeño al más grande. Para cada gen se proporcionan las siguientes estadísticas:
+- logFC: Diferencia media entre grupos.
+- AveExpr: Expresión media de todos los genes en la comparación.
+- t : Estadística t moderada (estadística similar a la prueba t para la comparación).
+- P.Value: Prueba valor p.
+- adj.P.Val: Valor p ajustado según Benjamini y Hochberg ( 1995 )
+- B: Estadística B: probabilidades de registro posterior del gen de ser versus no ser diferencial expresado.
+
+Primero comparamos expresión en células infectadas por Ad-VDR, vs la expresión de estas mismas células en medio con 10nM de vitD:
+
+```{r, echo=T, include=T}
+topTab_VDREvsVDRVD <- topTable(fit.main, number=nrow(fit.main), coef="VDREvsVDRVD", adjust="fdr")
+head(topTab_VDREvsVDRVD)
+```
+
+Cuanto mayor sea el valor absoluto del estadístico t, mayor es la probabilidad de que el gen esté diferencialmente expresado.
+Por otro lado, aquello genes en los que el p-valor sea inferior a cierto umbral(nivel de significación del test) nos servirá también para decidir  qué genes se declaran diferencialmente expresado. Rechazamos la hipótesis nula (la expresión entre dos genes no difiere) cuando el p-valor es más pequeño que el nivel de significación del test (0.01 por ejemplo)
+
+Ahora comparamos VDRVD con las células control (infectadas por adenovirus sin inserto):
+```{r, echo=T, include=T}
+topTab_controlvsVDRVD <- topTable(fit.main, number=nrow(fit.main), coef="controlvsVDRVD", adjust="fdr")
+head(topTab_controlvsVDRVD)
+
+```
+por último, 
+```{r, echo=T, include=T}
+topTab_controlvsVDRE <- topTable(fit.main, number=nrow(fit.main), coef="controlvsVDRE", adjust="fdr")
+head(topTab_controlvsVDRE)
+
+
+```
+
+
+## Anotación de genes.
+
+Consiste en averiguar a qué gen corresponde cada ID de Affymetrix (1a columna).
+
+```{r, echo=T, include=T, warning=F}
+library(hgu95av2.db)
+library(pd.clariom.s.human)
+library(annaffy)
+library(annotate)
+BiocManager::install("GO.db")
+BiocManager::install("KEGG.db")
+
+top10<-topTab_VDREvsVDRVD$ID[1:10]
+geneSymbol_VDREvsVDRVD<- unlist(mget(top10, hgu95av2SYMBOL))
+geneSymbol_VDREvsVDRVD
+
+```
+```{r, echo=T}
+
+geneTable_VDREvsVDRVD<- toTable(hgu95av2SYMBOL)
+rownames(geneTable_VDREvsVDRVD) <- geneTable_VDREvsVDRVD$probe_id
+geneTable_VDREvsVDRVD
+```
+```{r, echo=T, include=T}
+annotatedTopTable <- function(topTab, anotPackage)
+{
+  topTab <- cbind(PROBEID=rownames(topTab), topTab)
+  myProbes <- rownames(topTab)
+  thePackage <- eval(parse(text = anotPackage))
+  geneAnots <- select(thePackage, myProbes, c("SYMBOL", "ENTREZID", "GENENAME"))
+  annotatedTopTab<- merge(x=geneAnots, y=topTab, by.x="PROBEID", by.y="PROBEID")
+return(annotatedTopTab)
+}
+topAnnotated_VDREvsVDRVD <- annotatedTopTable(topTab_VDREvsVDRVD,
+anotPackage="mogene21sttranscriptcluster.db")
+topAnnotated_controlvsVDRE <- annotatedTopTable(topTab_controlvsVDRE,
+anotPackage="mogene21sttranscriptcluster.db")
+topAnnotated_controlvsVDRVD <- annotatedTopTable(topTab_controlvsVDRVD,
+anotPackage="mogene21sttranscriptcluster.db")
+
+short<- head(topAnnotated_VDREvsVDRVD[1:5,1:4])
+library(kableExtra)
+knitr::kable(short, booktabs = TRUE )
+show(short)
+
+```
+
+
+## Visualización de expresión diferencial.
+
+Los volcano plots permite ordenar los genes a lo largo de dos dimensiones, la biológica, representada por el fold change o diferencia de medias, y la estadística, representada por el logaritmo negativo del p-valor.
+
+```{r, echo=T, include=T}
+geneSymbols <- select(mogene21sttranscriptcluster.db, rownames(fit.main), c("SYMBOL"))
+SYMBOLS<- geneSymbols$SYMBOL
+volcanoplot(fit.main, coef=1,highlight= 5,names=SYMBOLS)
+abline(v=c(-1,1))
+```
+Cuanto más "hacia arriba" y "hacia fuera" se encuentra un gen, más fuerte es la evidencia de que esté diferencialmente expresado.
+
+## Comparaciones múltiples.
+
+Cuando uno selecciona genes en varias comparaciones, generalmente es interesante saber qué genes se han seleccionado en cada comparación. A veces, los genes biológicamente relevantes serán aquellos que se seleccionan en uno de ellos pero no en otros. En otras ocasiones, su interés radicará en los genes que se seleccionan en todas las comparaciones.
+```{r, echo=T, include=T}
+res <- decideTests(fit.main, method="separate", adjusadjust.method = "fdr", p.value = 0.1, lfc=1)
+sum.res.rows <- apply(abs(res),1,sum)
+res.selected<- res[sum.res.rows!=0,]
+print(summary(res))
+```
+
+```{r, echo=T, include=T}
+vennDiagram(res.selected[,1:3], cex=0.9, main="genes en comun entre las tres comparaciones realizadas")
+```
+
+## Significado biológico de los resultados.
+
+Se busca establecer si, dada una lista de genes seleccionados por ser expresados diferencialmente entre dos condiciones, las funciones, procesos biológicos o vías moleculares que los caracterizan aparecen en esta lista con más frecuencia que entre el resto de los genes analizados.
+
+Lista de genes que se analizarán:
+```{r, echo=T, include=T}
+listOfTables <- list(VDREvsVDRVD= topTab_VDREvsVDRVD, controlvsVDRE = topTab_controlvsVDRE, controlvsVDRVD= topTab_controlvsVDRVD)
+listOfSelected <- list()
+for (i in 1:length(listOfTables)){
+  topTab <- listOfTables[[i]]
+  whichGenes<-topTab["adj.P.Val"]<0.15
+  selectedIDs <- rownames(topTab)[whichGenes]
+  EntrezIDs<- select(mogene21sttranscriptcluster.db, selectedIDs, c("ENTREZID"))
+  EntrezIDs <- EntrezIDs$ENTREZID
+  listOfSelected[[i]] <- EntrezIDs
+  names(listOfSelected)[i] <- names(listOfTables)[i]
+}
+sapply(listOfSelected, length)
+
+```
+
+```{r, echo=T, include=T}
+mapped_genes2GO <- mappedkeys(org.Mm.egGO)
+mapped_genes2KEGG <- mappedkeys(org.Mm.egPATH)
+mapped_genes <- union(mapped_genes2GO , mapped_genes2KEGG)
+BiocManager::install("ReactomePA")
+```
+
+```{r, echo=T, include=T}
+library(ReactomePA)
+
+listOfData <- listOfSelected[1:2]
+comparisonsNames <- names(listOfData)
+universe <- mapped_genes
+```
+
+
+```{r, echo=T, include=T}
+
+for (i in 1:length(listOfData)){
+  genesIn <- listOfData[[i]]
+  comparison <- comparisonsNames[i]
+  enrich.result <- enrichPathway(gene = genesIn,
+                                 pvalueCutoff = 0.05,
+                                 readable = T,
+                                 pAdjustMethod = "BH",
+                                 organism = "mouse",
+                                 universe = universe)
+  
+  cat("##################################")
+  cat("\nComparison: ", comparison,"\n")
+  print(head(enrich.result))
+
+  if (length(rownames(enrich.result@result)) != 0) {
+  write.csv(as.data.frame(enrich.result), 
+             file =paste0("./results/","ReactomePA.Results.",comparison,".csv"), 
+             row.names = FALSE)
+  
+  pdf(file=paste0("./results/","ReactomePABarplot.",comparison,".pdf"))
+    print(barplot(enrich.result, showCategory = 15, font.size = 4, 
+            title = paste0("Reactome Pathway Analysis for ", comparison,". Barplot")))
+  dev.off()
+  
+  pdf(file = paste0("./results/","ReactomePAcnetplot.",comparison,".pdf"))
+    print(cnetplot(enrich.result, categorySize = "geneNum", schowCategory = 15, 
+         vertex.label.cex = 0.75))
+  dev.off()
+  }
+}
+```
+
+```{r, echo=T, include=T}
+cnetplot(enrich.result, categorySize = "geneNum", schowCategory = 5, vertex.label.cex = 0.75)
+
+
+```
+
+```{r, echo=T, include=T}
+Tab.react <- read.csv2(file.path("./results/ReactomePA.Results.VDREvsVDRVD.csv"), 
+                       sep = ",", header = TRUE, row.names = 1)
+
+Tab.react <- Tab.react[1:4, 1:5]
+knitr::kable(Tab.react, booktabs = TRUE, caption = "First rows and columns for Reactome results on VDREvsVDRVD.csv comparison")
+
+listOfFiles <- dir("./results/") 
+knitr::kable(listOfFiles, booktabs = TRUE, caption = 'List of files generated in the analysis', col.names="List_of_Files")
+
+
+
+```
+```{r, echo=T, include=T}
+Tab.react <- read.csv2(file.path("./results/ReactomePA.Results.controlvsVDRE.csv"), 
+                       sep = ",", header = TRUE, row.names = 1)
+
+Tab.react <- Tab.react[1:4, 1:5]
+knitr::kable(Tab.react, booktabs = TRUE, caption = "First rows and columns for Reactome results on controlvsVDRE.csv comparison")
+
+```
+
